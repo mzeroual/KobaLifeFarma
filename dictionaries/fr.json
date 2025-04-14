@@ -1,0 +1,123 @@
+{
+  "common": {
+    "navigation": {
+      "home": "ACCUEIL",
+      "products": "NOS GAMMES",
+      "about": "À PROPOS",
+      "news": "NOS ACTUALITÉS",
+      "contact": "CONTACT"
+    },
+    "buttons": {
+      "discover": "Découvrir",
+      "learnMore": "En savoir plus",
+      "readMore": "Lire la suite",
+      "seeAll": "Voir tout",
+      "send": "Envoyer"
+    }
+  },
+  "home": {
+    "hero": {
+      "slide1": {
+        "title": "Une gamme complète",
+        "subtitle": "Pour traiter la qualité de la peau",
+        "cta": "Je découvre"
+      },
+      "slide2": {
+        "title": "Science & Nature",
+        "subtitle": "Des formules innovantes aux actifs naturels",
+        "cta": "En savoir plus"
+      },
+      "slide3": {
+        "title": "Expertise Dermatologique",
+        "subtitle": "Des soins adaptés à tous les types de peau",
+        "cta": "Nos produits"
+      }
+    },
+    "products": {
+      "title": "Nos produits phares",
+      "subtitle": "Découvrez notre sélection de produits cosmétiques avancés pour tous types de peau.",
+      "cta": "Découvrir tous nos produits"
+    },
+    "brands": {
+      "title": "Nos gammes",
+      "subtitle": "Chaque gamme a été développée pour répondre à des besoins spécifiques, avec des formules innovantes alliant science et nature."
+    },
+    "about": {
+      "title": "À propos de KOBALIFE",
+      "paragraph1": "Fondée par Hafid Zeroulai et Karim, KOBALIFE est née d'une vision commune : créer des produits dermo-cosmétiques qui allient l'efficacité de la science et la puissance des actifs naturels.",
+      "paragraph2": "Notre approche repose sur des recherches approfondies et une sélection rigoureuse d'ingrédients pour offrir des solutions adaptées à tous les types de peau et répondre aux besoins spécifiques de chacun.",
+      "cta": "En savoir plus"
+    },
+    "news": {
+      "title": "Nos Actualités",
+      "subtitle": "Restez informé des dernières nouvelles, lancements de produits et événements de KOBALIFE.",
+      "cta": "Voir toutes les actualités"
+    }
+  },
+  "products": {
+    "notFound": "Gamme non trouvée",
+    "brandNotFoundDesc": "La gamme que vous recherchez n'existe pas.",
+    "productNotFound": "Produit non trouvé",
+    "productNotFoundDesc": "Le produit que vous recherchez n'existe pas.",
+    "about": "À propos de",
+    "discover": "Découvrez nos produits",
+    "innovativeSelection": "Une sélection de produits innovants pour répondre à tous vos besoins.",
+    "benefits": "Bénéfices",
+    "usage": "Conseils d'utilisation",
+    "ingredients": "Ingrédients",
+    "askAdvice": "Demander un conseil",
+    "relatedProducts": "Produits associés",
+    "backTo": "Retour à",
+    "image": "Image",
+    "categories": {
+      "face": "Visage",
+      "body": "Corps",
+      "antiAge": "Anti-âge",
+      "specific": "Traitements Spécifiques"
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Vous avez des questions sur nos produits ou souhaitez en savoir plus sur KOBALIFE ? N'hésitez pas à nous contacter.",
+    "info": {
+      "title": "Nos coordonnées",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "name": "Nom",
+      "email": "Email",
+      "subject": "Sujet",
+      "message": "Message",
+      "consent": "J'accepte de recevoir des informations de la part de KOBALIFE",
+      "submit": "Envoyer le message"
+    },
+    "faq": {
+      "title": "Questions fréquentes"
+    },
+    "findUs": "Nous trouver",
+    "mapError": "Impossible de charger la carte. Veuillez réessayer plus tard."
+  },
+  "footer": {
+    "about": "Où la science rencontre la nature pour des soins de peau exceptionnels.",
+    "links": "Liens Utiles",
+    "ourRanges": "Nos Gammes",
+    "aboutUs": "À Propos",
+    "contact": "Contact",
+    "legalMentions": "Mentions Légales",
+    "privacyPolicy": "Politique de Confidentialité",
+    "newsletter": {
+      "title": "Newsletter",
+      "text": "Inscrivez-vous à notre newsletter pour recevoir nos actualités et offres exclusives.",
+      "placeholder": "Votre email",
+      "button": "S'inscrire"
+    },
+    "copyright": "Tous droits réservés.",
+    "terms": "Conditions générales",
+    "privacy": "Confidentialité",
+    "cookies": "Cookies",
+    "rightsReserved": "Tous droits réservés."
+  }
+}
