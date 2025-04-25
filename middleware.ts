@@ -5,24 +5,36 @@ import type { NextRequest } from "next/server"
 const locales = ["en", "fr", "ar"]
 const defaultLocale = "fr"
 
-// Simplified language detection without external dependencies
+// Optimized language detection without external dependencies
 function getLocale(request: NextRequest): string {
   // Check for Accept-Language header
   const acceptLanguage = request.headers.get("accept-language")
 
   if (acceptLanguage) {
-    // Simple parsing of Accept-Language header
-    // Format is typically: en-US,en;q=0.9,fr;q=0.8
+    // Efficient parsing of Accept-Language header
     const parsedLocales = acceptLanguage
       .split(",")
-      .map((item) => item.split(";")[0].trim().split("-")[0]) // Get primary language tag
-      .filter(Boolean)
+      .map((item) => {
+        const [lang, priority] = item.split(";")
+        return {
+          lang: lang.trim().split("-")[0], // Get primary language tag
+          priority: priority ? Number.parseFloat(priority.split("=")[1] || "1") : 1,
+        }
+      })
+      .sort((a, b) => b.priority - a.priority) // Sort by priority
+      .map((item) => item.lang)
 
     // Find the first locale that is supported
     const matchedLocale = parsedLocales.find((locale) => locales.includes(locale))
     if (matchedLocale) {
       return matchedLocale
     }
+  }
+
+  // Check for locale in cookie
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value
+  if (cookieLocale && locales.includes(cookieLocale)) {
+    return cookieLocale
   }
 
   // Fallback to default locale
@@ -49,7 +61,15 @@ export function middleware(request: NextRequest) {
   const locale = getLocale(request)
   request.nextUrl.pathname = `/${locale}${pathname}`
 
-  return NextResponse.redirect(request.nextUrl)
+  // Set locale cookie for future requests
+  const response = NextResponse.redirect(request.nextUrl)
+  response.cookies.set("NEXT_LOCALE", locale, {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: "/",
+    sameSite: "lax",
+  })
+
+  return response
 }
 
 export const config = {

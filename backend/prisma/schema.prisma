@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // change to "sqlite" if you don’t have PostgreSQL yet
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  imageUrl    String
+  language    String   // "fr" or "en"
+  isFeatured  Boolean  @default(false)
+  gammeId     String
+  gamme       Gamme    @relation(fields: [gammeId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Gamme {
+  id       String    @id @default(uuid())
+  title    String
+  slug     String    @unique
+  language String
+  products Product[]
+}
+
+model AdminUser {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+}
+
+model ContactMessage {
+  id      String   @id @default(uuid())
+  name    String
+  email   String
+  subject String 
+  message String
+  sentAt  DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  joinedAt DateTime @default(now())
+}

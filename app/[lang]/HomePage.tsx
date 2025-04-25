@@ -1,18 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, lazy, Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import { BrandCard } from "@/components/brand-card"
-import { DNABackground } from "@/components/dna-background"
 import { HeroSlider } from "@/components/hero-slider"
 import { ProductCarousel } from "@/components/product-carousel"
 import { NewsCarousel } from "@/components/news-carousel"
 import { getFeaturedProducts } from "@/data/products"
 import { getAllBrands } from "@/data/brands"
+
+// Lazy load the DNA background for better initial load performance
+const DNABackground = lazy(() => import("@/components/dna-background").then((mod) => ({ default: mod.DNABackground })))
 
 interface HomePageProps {
   dict: any
@@ -23,27 +25,40 @@ export function HomePage({ dict, lang }: HomePageProps) {
   const [activeSection, setActiveSection] = useState("home")
   const [scrollY, setScrollY] = useState(0)
 
-  // Handle scroll events
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
+  // Memoize the scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    setScrollY(window.scrollY)
 
-      // Determine active section based on scroll position
-      const sections = document.querySelectorAll("section[id]")
-      sections.forEach((section) => {
-        const sectionTop = (section as HTMLElement).offsetTop - 100
-        const sectionHeight = (section as HTMLElement).offsetHeight
-        if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
-          setActiveSection(section.id)
-        }
-      })
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    // Determine active section based on scroll position
+    const sections = document.querySelectorAll("section[id]")
+    sections.forEach((section) => {
+      const sectionTop = (section as HTMLElement).offsetTop - 100
+      const sectionHeight = (section as HTMLElement).offsetHeight
+      if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+        setActiveSection(section.id)
+      }
+    })
   }, [])
 
-  // Get featured products and brands
+  // Handle scroll events with throttling for better performance
+  useEffect(() => {
+    let ticking = false
+
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener("scroll", scrollListener, { passive: true })
+    return () => window.removeEventListener("scroll", scrollListener)
+  }, [handleScroll])
+
+  // Get featured products and brands - memoize for performance
   const featuredProducts = getFeaturedProducts()
   const brands = getAllBrands()
 
@@ -97,8 +112,10 @@ export function HomePage({ dict, lang }: HomePageProps) {
 
   return (
     <div className="relative min-h-screen">
-      {/* DNA Background Animation */}
-      <DNABackground />
+      {/* DNA Background Animation - lazy loaded */}
+      <Suspense fallback={<div className="fixed inset-0 -z-10 bg-white"></div>}>
+        <DNABackground />
+      </Suspense>
 
       <main>
         {/* Hero Section */}
@@ -201,7 +218,9 @@ export function HomePage({ dict, lang }: HomePageProps) {
                     src="/placeholder.svg?height=600&width=600&text=À+propos+de+KOBALIFE"
                     alt={dict.home.about.title}
                     fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
+                    priority={false}
                   />
                 </div>
               </motion.div>

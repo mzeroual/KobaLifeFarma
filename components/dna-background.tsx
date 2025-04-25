@@ -1,15 +1,36 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, memo } from "react"
 import { useInView } from "react-intersection-observer"
 
-export function DNABackground() {
+// Define the Particle interface
+interface Particle {
+  x: number
+  y: number
+  size: number
+  speedX: number
+  speedY: number
+  color: string
+  baseSize: number
+  pulse: number
+  pulseDirection: number
+  update: () => void
+  draw: () => void
+}
+
+// Memoize the component to prevent unnecessary re-renders
+export const DNABackground = memo(function DNABackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isReducedMotion, setIsReducedMotion] = useState(false)
   const { ref: inViewRef, inView } = useInView({
     triggerOnce: false,
     threshold: 0.1,
   })
+
+  // Animation frame reference for proper cleanup
+  const animationFrameRef = useRef<number>()
+  // Store particles array in a ref to avoid recreating it on each render
+  const particlesRef = useRef<Particle[]>([])
 
   useEffect(() => {
     // Check for reduced motion preference
@@ -31,13 +52,14 @@ export function DNABackground() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    let animationFrameId: number
-    let particlesArray: Particle[] = []
-
-    // Set canvas dimensions
+    // Set canvas dimensions with device pixel ratio for sharper rendering
     const setCanvasDimensions = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = `${window.innerWidth}px`
+      canvas.style.height = `${window.innerHeight}px`
+      ctx.scale(dpr, dpr)
     }
 
     setCanvasDimensions()
@@ -48,7 +70,7 @@ export function DNABackground() {
 
     window.addEventListener("resize", setCanvasDimensions)
 
-    // DNA particle class
+    // DNA particle class - optimized
     class Particle {
       x: number
       y: number
@@ -77,8 +99,8 @@ export function DNABackground() {
         this.y += this.speedY
 
         // Bounce off edges
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1
+        if (this.x < 0 || this.x > window.innerWidth) this.speedX *= -1
+        if (this.y < 0 || this.y > window.innerHeight) this.speedY *= -1
       }
 
       draw() {
@@ -98,23 +120,29 @@ export function DNABackground() {
     }
 
     // Create particles - reduce count for better performance
-    const particleCount = isReducedMotion ? Math.min(50, window.innerWidth / 40) : Math.min(150, window.innerWidth / 15)
+    const particleCount = isReducedMotion
+      ? Math.min(30, Math.floor(window.innerWidth / 60))
+      : Math.min(100, Math.floor(window.innerWidth / 20))
+
+    // Clear previous particles
+    particlesRef.current = []
 
     for (let i = 0; i < particleCount; i++) {
-      const x = Math.random() * canvas.width
-      const y = Math.random() * canvas.height
-      particlesArray.push(new Particle(x, y))
+      const x = Math.random() * window.innerWidth
+      const y = Math.random() * window.innerHeight
+      particlesRef.current.push(new Particle(x, y))
     }
 
     // Connect particles with lines - optimize by reducing connections
     function connectParticles() {
       const maxDistance = isReducedMotion ? 150 : 200
       const skipFactor = isReducedMotion ? 3 : 2 // Skip particles for better performance
+      const particles = particlesRef.current
 
-      for (let a = 0; a < particlesArray.length; a += skipFactor) {
-        for (let b = a; b < particlesArray.length; b += skipFactor) {
-          const dx = particlesArray[a].x - particlesArray[b].x
-          const dy = particlesArray[a].y - particlesArray[b].y
+      for (let a = 0; a < particles.length; a += skipFactor) {
+        for (let b = a; b < particles.length; b += skipFactor) {
+          const dx = particles[a].x - particles[b].x
+          const dy = particles[a].y - particles[b].y
           const distance = Math.sqrt(dx * dx + dy * dy)
 
           if (distance < maxDistance) {
@@ -122,36 +150,39 @@ export function DNABackground() {
             ctx.strokeStyle = `rgba(16, 185, 129, ${opacity * 0.4})`
             ctx.lineWidth = 1
             ctx.beginPath()
-            ctx.moveTo(particlesArray[a].x, particlesArray[a].y)
-            ctx.lineTo(particlesArray[b].x, particlesArray[b].y)
+            ctx.moveTo(particles[a].x, particles[a].y)
+            ctx.lineTo(particles[b].x, particles[b].y)
             ctx.stroke()
           }
         }
       }
     }
 
-    // Animation loop
+    // Animation loop with performance optimizations
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
       // Update and draw particles
-      for (let i = 0; i < particlesArray.length; i++) {
+      const particles = particlesRef.current
+      for (let i = 0; i < particles.length; i++) {
         if (!isReducedMotion) {
-          particlesArray[i].update()
+          particles[i].update()
         }
-        particlesArray[i].draw()
+        particles[i].draw()
       }
 
       connectParticles()
-      animationFrameId = requestAnimationFrame(animate)
+      animationFrameRef.current = requestAnimationFrame(animate)
     }
 
     animate()
 
     return () => {
       window.removeEventListener("resize", setCanvasDimensions)
-      cancelAnimationFrame(animationFrameId)
-      particlesArray = []
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      particlesRef.current = []
     }
   }, [inView, isReducedMotion])
 
@@ -160,4 +191,4 @@ export function DNABackground() {
       <canvas ref={canvasRef} className="w-full h-full bg-white opacity-85" />
     </div>
   )
-}
+})

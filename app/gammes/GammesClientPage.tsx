@@ -14,7 +14,7 @@ export default function GammesClientPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
         <Image
-          src="/placeholder.svg?height=800&width=1600&text=Nos+Gammes"
+          src="/placeholder.svg?height=800&width=1600"
           alt="Nos Gammes"
           fill
           priority
